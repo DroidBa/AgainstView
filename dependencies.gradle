@@ -1,0 +1,23 @@
+def supportLibraryVersion = '25.3.1'
+
+ext {
+
+  android = [
+      applicationId    : "com.droidba.supercalendar.example",
+      buildToolsVersion: '26.0.2',
+      compileSdkVersion: 25,
+      minSdkVersion    : 16,
+      targetSdkVersion : 22,
+      versionCode      : 1,
+      versionName      : "1",
+  ]
+
+  dependencies = [
+      supportV4    : "com.android.support:support-v4:$supportLibraryVersion",
+      supportCompat: "com.android.support:appcompat-v7:$supportLibraryVersion",
+      supportDesign: "com.android.support:design:$supportLibraryVersion",
+      recyclerview : "com.android.support:recyclerview-v7:$supportLibraryVersion",
+      palettev7    : "com.android.support:palette-v7:$supportLibraryVersion",
+      jodatime     : "joda-time:joda-time:2.9.9"
+  ]
+}

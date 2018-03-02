@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="AgainstView">
+    <attr format="reference" name="backgroud"/>
+    <attr format="dimension" name="padding"/>
+  </declare-styleable>
+</resources>
