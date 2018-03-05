@@ -21,7 +21,7 @@ public interface AgainstAdapter {
 
   int getItemWidth();
 
-  View getView(int round, int group, View convertView, ViewGroup parent);
+  View getView(int round, int group, View convertView, ViewGroup parent, boolean isFristComing);
 
   int getItemViewType(int round, int group);
 

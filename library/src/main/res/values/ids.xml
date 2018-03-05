@@ -3,4 +3,5 @@
   <item name="tag_itemViewType" type="id"/>
   <item name="tag_itemRound" type="id"/>
   <item name="tag_itemGroup" type="id"/>
+  <item name="tag_hasAnimation" type="id"/>
 </resources>

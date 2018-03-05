@@ -21,4 +21,5 @@ dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
   implementation rootProject.ext.dependencies.supportDesign
   implementation project(':library')
+  implementation 'com.yayandroid:Rotatable:1.1.2'
 }

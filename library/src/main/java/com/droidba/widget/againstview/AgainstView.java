@@ -3,9 +3,13 @@ package com.droidba.widget.againstview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import com.droidba.widget.againstview.utils.DensityUtil;
 import com.droidba.widget.againstview.utils.ScreenUtil;
 import java.util.ArrayList;
@@ -42,6 +46,8 @@ public class AgainstView extends ViewGroup {
   private Recycler mRecycler;
   private ArrayList<Integer> mLinePoints;
   private ArrayList<List<Integer>> mPointMap;
+  private int offset = 1000;
+  private boolean isFristComing = true;
 
   public AgainstView(Context context) {
     super(context, null);
@@ -49,6 +55,8 @@ public class AgainstView extends ViewGroup {
 
   public AgainstView(Context context, AttributeSet attrs) {
     super(context, attrs, 0);
+    mRoundList = new ArrayList<>();
+    setWillNotDraw(false);
   }
 
   public AgainstView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -58,11 +66,9 @@ public class AgainstView extends ViewGroup {
   }
 
   private void init(AttributeSet attrs) {
-    setWillNotDraw(false);
     mMinItemMargin = DensityUtil.dp2px(getContext(), 5);
     mGroupPadding = DensityUtil.dp2px(getContext(), 10);
     mLineMargin = DensityUtil.dp2px(getContext(), 20);
-    mRoundList = new ArrayList<>();
     TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.AgainstView);
   }
 
@@ -144,7 +150,8 @@ public class AgainstView extends ViewGroup {
       top = top + mItemHeight + mLineMargin * 2;
       offset = (width - mSpecialItemWidth) / 2;
       left = offset;
-      makeAndSetup(3, 0, left, top, left + mSpecialItemWidth, top + mSpecialItemHeight);
+      mRoundList.add(
+          makeAndSetup(3, 0, left, top, left + mSpecialItemWidth, top + mSpecialItemHeight));
       //倒数第三行
       top = top + mSpecialItemHeight + mLineMargin * 2;
       offset = (width - mItemWidth) / 2;
@@ -168,6 +175,9 @@ public class AgainstView extends ViewGroup {
           left = width - mItemWidth;
         }
       }
+      mNeedRelayout = false;
+      isFristComing = false;
+      Log.d("Leo", "onLayout: " + isFristComing);
     }
   }
 
@@ -188,7 +198,7 @@ public class AgainstView extends ViewGroup {
       recycledView = mRecycler.getRecycledView(itemViewType);
     }
     /*根据View在对阵图的位置来确定View的类型*/
-    final View view = mAdapter.getView(round, group, recycledView, this);
+    final View view = mAdapter.getView(round, group, recycledView, this, isFristComing);
     view.setTag(R.id.tag_itemViewType, itemViewType); //储存View的类型
     view.setTag(R.id.tag_itemRound, round);
     view.setTag(R.id.tag_itemGroup, group);
@@ -221,7 +231,7 @@ public class AgainstView extends ViewGroup {
     /*设置进行重新填充布局*/
     mNeedRelayout = true;
     /*请求重新填充布局*/
-    requestLayout();
+    //requestLayout();
   }
 
   private class AgainstDataSetObserver extends DataSetObserver {
@@ -231,7 +241,7 @@ public class AgainstView extends ViewGroup {
     @Override
     public void onChanged() {
       mNeedRelayout = true;
-      requestLayout();
+      //requestLayout();
     }
 
     @Override
