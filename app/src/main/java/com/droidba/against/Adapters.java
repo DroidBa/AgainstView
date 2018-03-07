@@ -1,9 +1,11 @@
 package com.droidba.against;
 
+import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.droidba.widget.againstview.BaseAdapter;
@@ -16,6 +18,8 @@ import com.yayandroid.rotatable.Rotatable;
 public class Adapters extends BaseAdapter {
   private static final int TYPE_CENTER = 0;
   private static final int TYPE_ITEM = 1;
+  private static final int TYPE_LINE_ONE = 2;
+  private static final int TYPE_LINE_TWO = 3;
 
   @Override
   public int getMaxGroup() {
@@ -36,13 +40,21 @@ public class Adapters extends BaseAdapter {
   public View getView(int round, int group, View convertView, ViewGroup parent,
       final boolean isFristComing) {
     switch (getItemViewType(round, group)) {
+      case TYPE_LINE_ONE:
+        if (convertView == null) {
+          convertView =
+              LayoutInflater.from(parent.getContext()).inflate(R.layout.item_line, parent, false);
+        }
+        FrameLayout view = (FrameLayout) convertView.findViewById(R.id.line);
+        view.setBackgroundColor(convertView.getResources().getColor(R.color.colorAccent));
+        return convertView;
       case TYPE_ITEM:
         if (convertView == null) {
           convertView =
               LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
         }
-        ImageView view = (ImageView) convertView.findViewById(R.id.d);
-        view.setImageResource(R.drawable.p1);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.d);
+        imageView.setImageResource(R.drawable.p1);
         convertView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
           @Override
           public void onViewAttachedToWindow(View v) {
@@ -91,6 +103,10 @@ public class Adapters extends BaseAdapter {
   public int getItemViewType(int round, int group) {
     if (round == 3) {
       return TYPE_CENTER;
+    } else if (round == -2) {//上面的线
+      return TYPE_LINE_ONE;
+    } else if (round == -3) {//下面的线
+      return TYPE_LINE_TWO;
     } else {
       return TYPE_ITEM;
     }
@@ -98,6 +114,6 @@ public class Adapters extends BaseAdapter {
 
   @Override
   public int getViewTypeCount() {
-    return 2;
+    return 4;
   }
 }
