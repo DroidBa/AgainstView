@@ -1,19 +1,12 @@
 package com.droidba.widget.againstview;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.database.DataSetObserver;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import com.droidba.widget.againstview.utils.DensityUtil;
-import com.droidba.widget.againstview.utils.ScreenUtil;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 /**
@@ -21,23 +14,21 @@ import java.util.Stack;
  */
 
 public class AgainstView extends ViewGroup {
-  final int DESIGN_HEIGHT = 56;
-  final int DESIGN_SPECIAL_HEIGHT = 72;
-  final int DESIGN_THEIGHT = 448;
+  final int DESIGN_SPECIAL_HEIGHT = 72;//设计稿总决赛高
+  final int DESIGN_THEIGHT = 448;//设计稿布局高
 
-  final int DESIGN_WIDTH = 80;
-  final int DESIGN_SPECIAL_WIDTH = 265;
-  final int DESIGN_TWIDTH = 375;
+  final int DESIGN_WIDTH = 80;//设计稿item宽
+  final int DESIGN_SPECIAL_WIDTH = 265;//设计稿总决赛宽
+  final int DESIGN_TWIDTH = 375;//设计稿屏幕宽
 
-  final int DESIGN_LINE = 8;
-
-  private int mMinItemMargin;
+  private int mMinItemMargin;//item之间间隙单元值
 
   private int mItemWidth;
   private int mSpecialItemWidth;
   private int mItemHeight;
   private int mSpecialItemHeight;
-  private int mLineMargin;
+  private int mRoundMargin;
+  private int mLineWidth;
 
   boolean mNeedRelayout;
   boolean isFristComing = true;
@@ -63,7 +54,7 @@ public class AgainstView extends ViewGroup {
   }
 
   private void init(AttributeSet attrs) {
-    mLineMargin = DensityUtil.dp2px(getContext(), 20);
+    mRoundMargin = DensityUtil.dp2px(getContext(), 20);
   }
 
   @Override
@@ -97,10 +88,10 @@ public class AgainstView extends ViewGroup {
     mItemWidth = DESIGN_WIDTH * widthSize / DESIGN_TWIDTH;
     mMinItemMargin = (widthSize - 4 * mItemWidth) / 7;
     mSpecialItemWidth = DESIGN_SPECIAL_WIDTH * widthSize / DESIGN_TWIDTH;
+    mLineWidth = 10 * mMinItemMargin / 8;
   }
 
   private void resizeItemHeight(int heightSize) {
-    //mItemHeight = DESIGN_HEIGHT * heightSize / DESIGN_THEIGHT;
     mItemHeight = 56 * mItemWidth / 80;
     mSpecialItemHeight = DESIGN_SPECIAL_HEIGHT * heightSize / DESIGN_THEIGHT;
 
@@ -108,7 +99,7 @@ public class AgainstView extends ViewGroup {
     if (remainH < DensityUtil.dp2px(getContext(), 12)) {//需要减少item高度了
 
     } else {//合适
-      mLineMargin = remainH / 6;
+      mRoundMargin = remainH / 6;
     }
   }
 
@@ -138,7 +129,7 @@ public class AgainstView extends ViewGroup {
         }
       }
       //第二行
-      int roundTwoTop_Up = rountOneTop_Up + mItemHeight + mLineMargin;
+      int roundTwoTop_Up = rountOneTop_Up + mItemHeight + mRoundMargin;
       offset = (3 * mMinItemMargin + mItemWidth) / 2;
       left = offset;
       for (int i = 0; i < 2; i++) {
@@ -146,7 +137,8 @@ public class AgainstView extends ViewGroup {
         left = width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth;
       }
       //第二行画线
-      
+      draw_roundTwoUp_lines(width, rountOneTop_Up, offset, roundTwoTop_Up);
+
       //makeAndSetup(-2, 0, lineLeft, lineTop, lineLeft + 1, lineBottom);
 
       //最中间总决赛
@@ -157,13 +149,25 @@ public class AgainstView extends ViewGroup {
           roundMiddleTop + mSpecialItemHeight);
 
       //第三行
-      int roundThreeTop_Up = (int) (roundMiddleTop - 1.5 * mLineMargin - mItemHeight);
+      int roundThreeTop_Up = (int) (roundMiddleTop - 1.5 * mRoundMargin - mItemHeight);
       offset = (width - mItemWidth) / 2;
       left = offset;
       makeAndSetup(2, 0, left, roundThreeTop_Up, left + mItemWidth, roundThreeTop_Up + mItemHeight);
 
+      makeAndSetup(-2, 0, (3 * mMinItemMargin) / 2 + mItemWidth,
+          roundThreeTop_Up - 1 + mItemHeight / 2, (width - mItemWidth) / 2,
+          roundThreeTop_Up + mItemHeight / 2);
+      makeAndSetup(-2, 0, (width - mItemWidth) / 2 + mItemWidth,
+          roundThreeTop_Up - 1 + mItemHeight / 2, width - ((3 * mMinItemMargin) / 2 + mItemWidth),
+          roundThreeTop_Up + mItemHeight / 2);
+      makeAndSetup(-2, 0, (3 * mMinItemMargin) / 2 + mItemWidth, roundTwoTop_Up + mItemHeight,
+          (3 * mMinItemMargin) / 2 + mItemWidth + 1, roundThreeTop_Up + mItemHeight / 2);
+      makeAndSetup(-2, 0, width - ((3 * mMinItemMargin) / 2 + mItemWidth) - 1,
+          roundTwoTop_Up + mItemHeight, width - ((3 * mMinItemMargin) / 2 + mItemWidth),
+          roundThreeTop_Up + mItemHeight / 2);
+
       //倒数第三行
-      int roundThreeTop_Down = (int) (roundMiddleTop + 1.5 * mLineMargin + mSpecialItemHeight);
+      int roundThreeTop_Down = (int) (roundMiddleTop + 1.5 * mRoundMargin + mSpecialItemHeight);
       offset = (width - mItemWidth) / 2;
       left = offset;
       makeAndSetup(2, 1, left, roundThreeTop_Down, left + mItemWidth,
@@ -182,9 +186,8 @@ public class AgainstView extends ViewGroup {
           left = width - mItemWidth - mMinItemMargin;
         }
       }
-
       //倒数第二行
-      int roundTwoTop_Down = height - mLineMargin - mItemHeight * 2;
+      int roundTwoTop_Down = height - mRoundMargin - mItemHeight * 2;
       offset = (3 * mMinItemMargin + mItemWidth) / 2;
       left = offset;
       for (int i = 0; i < 2; i++) {
@@ -192,11 +195,85 @@ public class AgainstView extends ViewGroup {
             roundTwoTop_Down + mItemHeight);
         left = width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth;
       }
+      //倒数第二行画线
+      draw_roundTwoDown_line(width, offset, roundOneTop_Down, roundTwoTop_Down);
+
+      //倒数第三行画线
+      makeAndSetup(-3, 0, (3 * mMinItemMargin) / 2 + mItemWidth,
+          roundThreeTop_Down - 1 + mItemHeight / 2, (width - mItemWidth) / 2,
+          roundThreeTop_Down + mItemHeight / 2);
+      makeAndSetup(-3, 0, (width - mItemWidth) / 2 + mItemWidth,
+          roundThreeTop_Down - 1 + mItemHeight / 2, width - ((3 * mMinItemMargin) / 2 + mItemWidth),
+          roundThreeTop_Down + mItemHeight / 2);
+      makeAndSetup(-3, 0, (3 * mMinItemMargin) / 2 + mItemWidth,
+          roundThreeTop_Down + mItemHeight / 2, (3 * mMinItemMargin) / 2 + mItemWidth + 1,
+          roundTwoTop_Down);
+      makeAndSetup(-3, 0, width - ((3 * mMinItemMargin) / 2 + mItemWidth) - 1,
+          roundThreeTop_Down + mItemHeight / 2, width - ((3 * mMinItemMargin) / 2 + mItemWidth),
+          roundTwoTop_Down);
 
       mNeedRelayout = false;
       isFristComing = false;
       Log.d("Leo", "onLayout: " + isFristComing);
     }
+  }
+
+  //倒数第二轮画线
+  private void draw_roundTwoDown_line(int width, int offset, int roundOneTop_Down,
+      int roundTwoTop_Down) {
+    makeAndSetup(-3, 0, offset - mLineWidth, roundTwoTop_Down + mItemHeight / 2 - 1, offset,
+        roundTwoTop_Down + mItemHeight / 2);
+    makeAndSetup(-3, 0, offset + mItemWidth, roundTwoTop_Down + mItemHeight / 2 - 1,
+        offset + mItemWidth + mLineWidth, roundTwoTop_Down + mItemHeight / 2);
+    makeAndSetup(-3, 0, width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth - mLineWidth,
+        roundTwoTop_Down + mItemHeight / 2 - 1,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth,
+        roundTwoTop_Down + mItemHeight / 2);
+    makeAndSetup(-3, 0, width - (3 * mMinItemMargin + mItemWidth) / 2,
+        roundTwoTop_Down + mItemHeight / 2 - 1,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 + mLineWidth,
+        roundTwoTop_Down + mItemHeight / 2);//所有横线
+
+    makeAndSetup(-3, 0, offset - mLineWidth, roundTwoTop_Down + mItemHeight / 2,
+        offset - mLineWidth + 1, roundOneTop_Down);
+    makeAndSetup(-3, 0, offset + mItemWidth + mLineWidth - 1, roundTwoTop_Down + mItemHeight / 2,
+        offset + mItemWidth + mLineWidth, roundOneTop_Down);
+    makeAndSetup(-3, 0, width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth - mLineWidth,
+        roundTwoTop_Down + mItemHeight / 2,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth - mLineWidth + 1,
+        roundOneTop_Down);
+    makeAndSetup(-3, 0, width - (3 * mMinItemMargin + mItemWidth) / 2 + mLineWidth - 1,
+        roundTwoTop_Down + mItemHeight / 2,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 + mLineWidth, roundOneTop_Down);//所有竖线
+  }
+
+  //第二轮画线
+  private void draw_roundTwoUp_lines(int width, int rountOneTop_Up, int offset,
+      int roundTwoTop_Up) {
+    makeAndSetup(-2, 0, offset - mLineWidth, roundTwoTop_Up + mItemHeight / 2 - 1, offset,
+        roundTwoTop_Up + mItemHeight / 2);
+    makeAndSetup(-2, 0, offset + mItemWidth, roundTwoTop_Up + mItemHeight / 2 - 1,
+        offset + mItemWidth + mLineWidth, roundTwoTop_Up + mItemHeight / 2);
+    makeAndSetup(-2, 0, width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth - mLineWidth,
+        roundTwoTop_Up + mItemHeight / 2 - 1,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth,
+        roundTwoTop_Up + mItemHeight / 2);
+    makeAndSetup(-2, 0, width - (3 * mMinItemMargin + mItemWidth) / 2,
+        roundTwoTop_Up + mItemHeight / 2 - 1,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 + mLineWidth,
+        roundTwoTop_Up + mItemHeight / 2);//所有横线
+
+    makeAndSetup(-2, 0, offset - mLineWidth, rountOneTop_Up + mItemHeight, offset - mLineWidth + 1,
+        roundTwoTop_Up + mItemHeight / 2 - 1);
+    makeAndSetup(-2, 0, offset + mItemWidth + mLineWidth - 1, rountOneTop_Up + mItemHeight,
+        offset + mItemWidth + mLineWidth, roundTwoTop_Up + mItemHeight / 2 - 1);
+    makeAndSetup(-2, 0, width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth - mLineWidth,
+        rountOneTop_Up + mItemHeight,
+        width - (3 * mMinItemMargin + mItemWidth) / 2 - mItemWidth - mLineWidth + 1,
+        roundTwoTop_Up + mItemHeight / 2 - 1);
+    makeAndSetup(-2, 0, width - (3 * mMinItemMargin + mItemWidth) / 2 + mLineWidth - 1,
+        rountOneTop_Up + mItemHeight, width - (3 * mMinItemMargin + mItemWidth) / 2 + mLineWidth,
+        roundTwoTop_Up + mItemHeight / 2 - 1);//所有竖线
   }
 
   private View makeAndSetup(int round, int group, int left, int top, int right, int bottom) {

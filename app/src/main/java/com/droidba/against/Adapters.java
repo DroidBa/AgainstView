@@ -4,6 +4,7 @@ import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -41,9 +42,39 @@ public class Adapters extends BaseAdapter {
       final boolean isFristComing) {
     switch (getItemViewType(round, group)) {
       case TYPE_LINE_ONE:
+      case TYPE_LINE_TWO:
         if (convertView == null) {
           convertView =
               LayoutInflater.from(parent.getContext()).inflate(R.layout.item_line, parent, false);
+        }
+        if (getItemViewType(round, group) == TYPE_LINE_ONE) {
+          convertView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+              if (isFristComing) {
+                startTranslateAnimation(v);
+              }
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+
+            }
+          });
+        } else {
+          convertView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+              if (isFristComing) {
+                startTranslateAnimationDown(v);
+              }
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+
+            }
+          });
         }
         FrameLayout view = (FrameLayout) convertView.findViewById(R.id.line);
         view.setBackgroundColor(convertView.getResources().getColor(R.color.colorAccent));
@@ -55,19 +86,36 @@ public class Adapters extends BaseAdapter {
         }
         ImageView imageView = (ImageView) convertView.findViewById(R.id.d);
         imageView.setImageResource(R.drawable.p1);
-        convertView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-          @Override
-          public void onViewAttachedToWindow(View v) {
-            if (isFristComing) {
-              startTranslateAnimation(v);
+        if (isHalfUp(round, group)) {
+          convertView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+              if (isFristComing) {
+                startTranslateAnimation(v);
+              }
             }
-          }
 
-          @Override
-          public void onViewDetachedFromWindow(View v) {
+            @Override
+            public void onViewDetachedFromWindow(View v) {
 
-          }
-        });
+            }
+          });
+        } else {
+          convertView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+              if (isFristComing) {
+                startTranslateAnimationDown(v);
+              }
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+
+            }
+          });
+        }
+
         return convertView;
       case TYPE_CENTER:
         if (convertView == null) {
@@ -94,8 +142,17 @@ public class Adapters extends BaseAdapter {
 
   private void startTranslateAnimation(final View view) {
     TranslateAnimation translateAnimation = new TranslateAnimation(0.0f, 0.0f, -200.0f, 0.0f);
+    translateAnimation.setInterpolator(new BounceInterpolator());
     translateAnimation.setFillAfter(false);
-    translateAnimation.setDuration(500);
+    translateAnimation.setDuration(700);
+    view.startAnimation(translateAnimation);
+  }
+
+  private void startTranslateAnimationDown(final View view) {
+    TranslateAnimation translateAnimation = new TranslateAnimation(0.0f, 0.0f, 200.0f, 0.0f);
+    translateAnimation.setInterpolator(new BounceInterpolator());
+    translateAnimation.setFillAfter(false);
+    translateAnimation.setDuration(700);
     view.startAnimation(translateAnimation);
   }
 
@@ -110,6 +167,23 @@ public class Adapters extends BaseAdapter {
     } else {
       return TYPE_ITEM;
     }
+  }
+
+  public boolean isHalfUp(int round, int group) {
+    if (round == 0 && group < 4) {
+      return true;
+    } else if (round == 0 && group >= 4) {
+      return false;
+    } else if (round == 1 && group < 2) {
+      return true;
+    } else if (round == 1 && group >= 2) {
+      return false;
+    } else if (round == 2 && group < 1) {
+      return true;
+    } else if (round == 2 && group >= 1) {
+      return false;
+    }
+    return false;
   }
 
   @Override
