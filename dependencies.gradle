@@ -3,7 +3,7 @@ def supportLibraryVersion = '25.3.1'
 ext {
 
   android = [
-      applicationId    : "com.droidba.supercalendar.example",
+      applicationId    : "com.droidba.againstview",
       buildToolsVersion: '25.0.2',
       compileSdkVersion: 25,
       minSdkVersion    : 14,
