@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.droidba.widget.againstview.utils.DensityUtil;
+import java.math.BigDecimal;
 import java.util.Stack;
 
 /**
@@ -293,7 +294,11 @@ public class AgainstView extends ViewGroup {
       recycledView = mRecycler.getRecycledView(itemViewType);
     }
     /*根据View在对阵图的位置来确定View的类型*/
-    final View view = mAdapter.getView(round, group, recycledView, this, isFristComing);
+    BigDecimal design = new BigDecimal(DESIGN_WIDTH);
+    BigDecimal realItem = new BigDecimal(mItemWidth);
+    BigDecimal scale = design.divide(realItem);
+    final View view =
+        mAdapter.getView(round, group, recycledView, this, isFristComing, DESIGN_WIDTH);
     view.setTag(R.id.tag_itemViewType, itemViewType); //储存View的类型
     view.setTag(R.id.tag_itemRound, round);
     view.setTag(R.id.tag_itemGroup, group);
